@@ -1,0 +1,98 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: e-engineer-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-e_engineer}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-e_engineer}
+      POSTGRES_DB: ${DB_DATABASE:-e_engineer}
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-e_engineer} -d ${DB_DATABASE:-e_engineer}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - e-engineer-network
+
+  backend:
+    build:
+      context: ./e-engineer-backend
+      dockerfile: Dockerfile
+      target: deps
+    container_name: e-engineer-backend
+    restart: unless-stopped
+    env_file:
+      - ./e-engineer-backend/.env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USERNAME: "${DB_USERNAME:-e_engineer}"
+      DB_PASSWORD: "${DB_PASSWORD:-e_engineer}"
+      DB_DATABASE: "${DB_DATABASE:-e_engineer}"
+      DB_SYNCHRONIZE: "false"
+      DB_LOGGING: "false"
+      DB_MIGRATIONS_RUN: "false"
+      JWT_SECRET: "${JWT_SECRET:-local-development-secret-with-at-least-32-characters}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-1d}"
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./e-engineer-backend/src:/usr/src/app/src
+      - ./e-engineer-backend/test:/usr/src/app/test
+      - ./e-engineer-backend/scripts:/usr/src/app/scripts
+      - ./e-engineer-backend/package.json:/usr/src/app/package.json:ro
+      - ./e-engineer-backend/package-lock.json:/usr/src/app/package-lock.json:ro
+      - ./e-engineer-backend/nest-cli.json:/usr/src/app/nest-cli.json:ro
+      - ./e-engineer-backend/tsconfig.json:/usr/src/app/tsconfig.json:ro
+      - ./e-engineer-backend/tsconfig.build.json:/usr/src/app/tsconfig.build.json:ro
+      - backend_node_modules:/usr/src/app/node_modules
+    command: sh -c "npm run db:migration:run && npm run db:seed && npm run start:dev"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - e-engineer-network
+
+  frontend:
+    build:
+      context: ./e-engineer-frontend
+      dockerfile: Dockerfile
+    container_name: e-engineer-frontend
+    restart: unless-stopped
+    env_file:
+      - ./e-engineer-frontend/.env
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - '5173:5173'
+    depends_on:
+      backend:
+        condition: service_started
+    volumes:
+      - ./e-engineer-frontend:/usr/src/app
+      - frontend_node_modules:/usr/src/app/node_modules
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    networks:
+      - e-engineer-network
+
+networks:
+  e-engineer-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: e-engineer-postgres-data
+  backend_node_modules:
+  frontend_node_modules:
