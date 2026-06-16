@@ -38,11 +38,15 @@ interface Project {
 id: string;
 name: string;
 description?: string;
+client?: string | null;
+projectType?: string | null;
+responsibleName?: string | null;
 status: 'draft' | 'active' | 'paused' | 'completed' | 'archived';
 organizationId: string;
 startDate?: string; // ISO date
 endDate?: string; // ISO date
 progress: number; // 0-100
+tags?: string[];
 metrics?: Record<string, number>;
 }
 
@@ -55,6 +59,8 @@ dueDate?: string;
 status: 'todo'|'in_progress'|'done'|'blocked';
 type: 'technical_survey'|'architectural_project'|'structural_project'|'electrical_project'|'hydraulic_project'|'drainage_project'|'paving_project'|'landscaping_project'|'lighting_project'|'descriptive_memorial'|'budget'|'schedule'|'art_rrt'|'photographic_report'|'technical_report'|'other';
 assignees: string[]; // user ids
+tagIds?: string[];
+tags?: { id: string; name: string; slug: string; category: string; status: string }[];
 attachments?: { url: string; name: string }[];
 }
 
@@ -83,6 +89,26 @@ decidedBy?: string | null;
 decidedAt?: string | null;
 createdAt: string;
 updatedAt: string;
+}
+
+type TechnicalTagCategory = 'project_type' | 'technical_discipline' | 'document_type' | 'operational_pain' | 'client_context' | 'project_stage' | 'knowledge_purpose';
+type TechnicalTagStatus = 'active' | 'pending_review' | 'deprecated' | 'archived';
+
+interface TechnicalTag {
+id: string;
+organizationId: string;
+name: string;
+slug: string;
+category: TechnicalTagCategory;
+description?: string | null;
+status: TechnicalTagStatus;
+usageCount: number;
+createdBy: string;
+updatedBy?: string | null;
+createdAt: string;
+updatedAt: string;
+archivedAt?: string | null;
+deprecatedAt?: string | null;
 }
 ```
 
@@ -130,9 +156,13 @@ Envelope real do endpoint:
 - `POST /priority-requests/:id/apply` aplica prioridade pendente.
 - `POST /priority-requests/:id/reject` rejeita prioridade pendente.
 - `GET /projects?page=1&pageSize=20` retorna projetos paginados.
+- `POST /projects/recommend-bases` recebe `{ tagIds, limit? }` e retorna projetos base recomendados por tags tecnicas dos entregaveis e dos KnowledgeItems vinculados ao projeto/entregaveis, com tags combinadas, preview de entregaveis, documentos e contagem de revisoes.
 - `GET /projects/:id` retorna detalhe do projeto.
+- `GET /projects/:id/knowledge` retorna KnowledgeItems aplicados ao projeto e aos entregaveis do projeto, incluindo `targetType` e `targetId`.
+- `GET /projects/:id/knowledge/recommendations` retorna KnowledgeItems publicados recomendados por tags tecnicas dos entregaveis do projeto, com `matchedTags`, `score` e `reason`.
 - `GET /deliverables?projectId=<uuid>` retorna entregaveis.
 - `GET /deliverables/:id` retorna detalhe do entregavel.
+- `POST /projects` cria projeto usando organizationId do usuario autenticado; aceita `baseProjectId` opcional para copiar entregaveis/tags/documentos/versoes/revisoes do projeto base sem responsaveis/revisores no novo projeto.
 - `POST /deliverables` cria entregavel usando organizationId do usuario autenticado.
 - `PATCH /deliverables/:id` atualiza campos editaveis do entregavel.
 - `GET /documents` retorna documentos e revisao oficial.
@@ -145,7 +175,14 @@ Envelope real do endpoint:
 - `POST /knowledge-base/:id/publish` publica item em rascunho.
 - `POST /knowledge-base/:id/archive` arquiva item.
 - `POST /knowledge-base/:id/relations` cria relacao generica com outro alvo do tenant.
+- `POST /projects/:projectId/knowledge` vincula KnowledgeItem ao projeto; aceita `deliverableId` opcional para criar `KnowledgeRelation` com `targetType = deliverable`.
 - `POST /projects/:projectId/promote-to-knowledge` promove projeto para referencia da base.
+- `GET /technical-tags?search=&category=&status=&includeArchived=&page=&limit=` lista tags tecnicas do tenant com contagem de uso quando disponivel.
+- `GET /technical-tags/:id` retorna detalhe da tag tecnica.
+- `POST /technical-tags` cria tag tecnica no tenant autenticado.
+- `PATCH /technical-tags/:id` atualiza campos editaveis da tag tecnica.
+- `POST /technical-tags/:id/archive` arquiva tag tecnica sem exclusao fisica.
+- `POST /technical-tags/:id/deprecate` marca tag tecnica como obsoleta sem exclusao fisica.
 - `GET /audit` retorna eventos auditaveis.
 
 Todos os endpoints, exceto login, exigem `Authorization: Bearer <token>`.
