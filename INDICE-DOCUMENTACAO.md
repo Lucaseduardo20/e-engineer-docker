@@ -179,6 +179,15 @@
 
 ## 📂 Documentos Frontend (e-engineer-frontend/)
 
+## Subepico — Criacao assistida por contexto tecnico
+
+- `docs/subepico-criacao-assistida-projetos-contexto-tecnico.md` — visao consolidada do subepico, entidades, regras, endpoints e limitacoes.
+- `docs/project-assisted-creation.md` — wizard de criacao, payloads e fluxo frontend/backend.
+- `docs/project-technical-profile.md` — calculo de score tecnico por multiplas fontes.
+- `docs/project-context-recommendations.md` — recomendacoes contextuais no cockpit.
+- `docs/demo/assisted-project-creation-demo-flow.md` — roteiro de demo UBS/Reforma Escolar.
+- `docs/qa-assisted-project-creation.md` — cenarios de QA e comandos.
+
 ### 10. **frontend-agent.md** 🖥️
 📍 Localização: `/e-engineer-frontend/frontend-agent.md`  
 📖 Tipo: GUIA OPERACIONAL DO AGENTE  
@@ -382,4 +391,3 @@ Estes documentos **UPDATE conforme aprende**:
 **Documentação final criada com sucesso! 📚**
 
 Use este índice como referência para navegar todo o projeto.
-

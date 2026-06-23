@@ -17,50 +17,6 @@ O objetivo deste subépico é lançar uma inteligência vendável no produto: a 
 Frase-guia:
 
 > A e-engineer não começa um projeto do zero. Ela começa com a inteligência acumulada da sua empresa.
-
-## Documentações obrigatórias para leitura
-
-Antes de implementar qualquer coisa, leia profundamente:
-
-- `docs/master.md`
-- `docs/business/01-product-vision.md`
-- `docs/business/02-domain-map.md`
-- `docs/business/03-business-flows.md`
-- `docs/business/04-business-rules.md`
-- `docs/business/05-knowledge-base.md`
-- `docs/business/06-intelligence-roadmap.md`
-- `docs/epics/01-epic-knowledge-base-operacional.md`
-- `docs/epics/01-epic-knowledge-base-backlog.md`
-- `docs/epics/02-epic-cockpit-tecnico.md`
-- `docs/epics/02-epic-cockpit-tecnico-backlog.md`
-- `docs/epics/subepico-criacao-assistida-projetos-contexto-tecnico.md`, se existir
-- `docs/modules/knowledge-base.md`
-- `docs/modules/knowledge-base-api.md`
-- `docs/modules/knowledge-base-permissions.md`
-- `docs/modules/technical-taxonomy.md`, se existir
-- `docs/modules/project-cockpit.md`, se existir
-- `docs/demo/knowledge-base-demo-flow.md`
-- `docs/demo/project-cockpit-demo-flow.md`, se existir
-
-Se algum arquivo não existir exatamente nesses caminhos, procure o equivalente dentro de `docs/`.
-
-## Código obrigatório para análise
-
-Antes de alterar código, leia a estrutura real do projeto e entenda:
-
-- backend NestJS, TypeScript, TypeORM e PostgreSQL;
-- arquitetura DDD/Clean Architecture;
-- entidades de domínio separadas de ORM;
-- use cases na camada de aplicação;
-- controllers finos;
-- repositórios por contrato;
-- migrations e seeds;
-- multi-tenancy por `organizationId`;
-- frontend Vue 3, Composition API, services/composables e componentes existentes;
-- módulos Organizations, Projects, Deliverables, Documents, DocumentVersions, Reviews, Knowledge Base, KnowledgeRelation e TechnicalTags.
-
-Não invente uma arquitetura paralela. Siga os padrões já existentes.
-
 ## Regra de ouro
 
 Qualquer implementação deve preservar:

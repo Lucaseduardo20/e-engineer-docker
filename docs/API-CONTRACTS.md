@@ -156,8 +156,11 @@ Envelope real do endpoint:
 - `POST /priority-requests/:id/apply` aplica prioridade pendente.
 - `POST /priority-requests/:id/reject` rejeita prioridade pendente.
 - `GET /projects?page=1&pageSize=20` retorna projetos paginados.
-- `POST /projects/recommend-bases` recebe `{ tagIds, limit? }` e retorna projetos base recomendados por tags tecnicas dos entregaveis e dos KnowledgeItems vinculados ao projeto/entregaveis, com tags combinadas, preview de entregaveis, documentos e contagem de revisoes.
+- `POST /projects/recommend-bases` recebe `{ tagIds, limit? }` e retorna projetos base recomendados por tags tecnicas do projeto, entregaveis, documentos e KnowledgeItems vinculados, com tags combinadas, score de aderencia, preview de entregaveis, documentos e contagem de revisoes.
 - `GET /projects/:id` retorna detalhe do projeto.
+- `POST /projects/from-base` cria projeto a partir de projeto existente do mesmo tenant. Aceita `inheritTags`, `inheritDeliverables` e `deliverablesToInherit`.
+- `GET /projects/:id/technical-profile` retorna contexto tecnico consolidado com tags, score e fontes.
+- `GET /projects/:id/knowledge/recommendations` retorna recomendacoes contextuais de KnowledgeItems com `type`, `score`, `matchedTags`, `reason` e `alreadyApplied`.
 - `GET /projects/:id/knowledge` retorna KnowledgeItems aplicados ao projeto e aos entregaveis do projeto, incluindo `targetType` e `targetId`.
 - `GET /projects/:id/knowledge/recommendations` retorna KnowledgeItems publicados recomendados por tags tecnicas dos entregaveis do projeto, com `matchedTags`, `score` e `reason`.
 - `GET /deliverables?projectId=<uuid>` retorna entregaveis.
